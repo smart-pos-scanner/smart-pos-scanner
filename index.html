@@ -25,10 +25,17 @@
 
   <p id="statusKamera"></p>
 
+  <h2>Hasil Barcode</h2>
+  <p id="hasilBarcode">Belum ada barcode terbaca.</p>
+
   <script>
     const btnBukaKamera = document.getElementById('btnBukaKamera');
     const previewKamera = document.getElementById('previewKamera');
     const statusKamera = document.getElementById('statusKamera');
+    const hasilBarcode = document.getElementById('hasilBarcode');
+
+    let barcodeDetector = null;
+    let prosesScanAktif = false;
 
     btnBukaKamera.addEventListener('click', async function () {
       try {
@@ -44,12 +51,57 @@
         previewKamera.srcObject = stream;
         previewKamera.style.display = 'block';
 
+        await previewKamera.play();
+
         statusKamera.textContent = '✅ Kamera berhasil dibuka.';
+
+        if (!('BarcodeDetector' in window)) {
+          hasilBarcode.textContent =
+            '❌ BarcodeDetector tidak didukung browser ini.';
+          return;
+        }
+
+        barcodeDetector = new BarcodeDetector({
+          formats: [
+            'ean_13',
+            'ean_8',
+            'code_128',
+            'code_39',
+            'upc_a',
+            'upc_e'
+          ]
+        });
+
+        prosesScanAktif = true;
+        scanBarcode();
+
       } catch (err) {
         statusKamera.textContent =
           '❌ Kamera gagal dibuka: ' + err.name + ' - ' + err.message;
       }
     });
+
+    async function scanBarcode() {
+      if (!prosesScanAktif || !barcodeDetector) return;
+
+      try {
+        const barcodes = await barcodeDetector.detect(previewKamera);
+
+        if (barcodes.length > 0) {
+          const nilaiBarcode = String(barcodes[0].rawValue || '').trim();
+
+          if (nilaiBarcode) {
+            hasilBarcode.textContent = '✅ ' + nilaiBarcode;
+            prosesScanAktif = false;
+            return;
+          }
+        }
+      } catch (err) {
+        console.log('Scan barcode:', err);
+      }
+
+      requestAnimationFrame(scanBarcode);
+    }
   </script>
 
 </body>
