@@ -9,7 +9,48 @@
 
   <h1>SMART Scanner</h1>
   <p>SMART POS Mobile Barcode Scanner</p>
-  <p>HTTPS Scanner Test: OK</p>
+
+  <button id="btnBukaKamera">
+    📷 Buka Kamera
+  </button>
+
+  <br><br>
+
+  <video
+    id="previewKamera"
+    autoplay
+    playsinline
+    style="width:100%;max-width:500px;display:none;">
+  </video>
+
+  <p id="statusKamera"></p>
+
+  <script>
+    const btnBukaKamera = document.getElementById('btnBukaKamera');
+    const previewKamera = document.getElementById('previewKamera');
+    const statusKamera = document.getElementById('statusKamera');
+
+    btnBukaKamera.addEventListener('click', async function () {
+      try {
+        statusKamera.textContent = 'Membuka kamera...';
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' }
+          },
+          audio: false
+        });
+
+        previewKamera.srcObject = stream;
+        previewKamera.style.display = 'block';
+
+        statusKamera.textContent = '✅ Kamera berhasil dibuka.';
+      } catch (err) {
+        statusKamera.textContent =
+          '❌ Kamera gagal dibuka: ' + err.name + ' - ' + err.message;
+      }
+    });
+  </script>
 
 </body>
 </html>
