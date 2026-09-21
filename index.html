@@ -90,11 +90,14 @@
         if (barcodes.length > 0) {
           const nilaiBarcode = String(barcodes[0].rawValue || '').trim();
 
-          if (nilaiBarcode) {
-            hasilBarcode.textContent = '✅ ' + nilaiBarcode;
-            prosesScanAktif = false;
-            return;
-          }
+if (nilaiBarcode) {
+  hasilBarcode.textContent = '✅ ' + nilaiBarcode;
+  prosesScanAktif = false;
+
+  console.log('SMART BARCODE SIAP DIKIRIM:', nilaiBarcode);
+
+  return;
+}
         }
       } catch (err) {
         console.log('Scan barcode:', err);
