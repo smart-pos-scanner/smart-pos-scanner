@@ -96,17 +96,11 @@ if (nilaiBarcode) {
 
   console.log('SMART BARCODE SIAP DIKIRIM:', nilaiBarcode);
 
-alert(
-  'TEST OPENER:\n' +
-  'window.opener = ' + (window.opener ? 'ADA' : 'TIDAK ADA')
-);
-  
-if (window.opener && !window.opener.closed) {
-  window.opener.postMessage({
-    type: 'SMART_POS_BARCODE',
-    barcode: nilaiBarcode
-  }, '*');
-}
+const urlPOS =
+  'https://script.google.com/macros/s/AKfycbw1xMC_sswRgcTvLdMzHL89TfJNjA0Z8oGQbIjiFyN5VUN72OP7M7KEyk9QQJfMgUWC/exec';
+
+window.location.href =
+  urlPOS + '?barcode=' + encodeURIComponent(nilaiBarcode);
   
   return;
 }
