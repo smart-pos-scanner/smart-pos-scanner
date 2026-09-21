@@ -96,6 +96,13 @@ if (nilaiBarcode) {
 
   console.log('SMART BARCODE SIAP DIKIRIM:', nilaiBarcode);
 
+if (window.opener && !window.opener.closed) {
+  window.opener.postMessage({
+    type: 'SMART_POS_BARCODE',
+    barcode: nilaiBarcode
+  }, '*');
+}
+  
   return;
 }
         }
