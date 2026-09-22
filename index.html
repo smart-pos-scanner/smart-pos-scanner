@@ -364,31 +364,11 @@ if(menungguBarcodePergi){
       1200
     ){
 
-menungguBarcodePergi = true;
+barcodeSudahPergi = true;
+
 waktuMulaiKosong = 0;
-barcodeSudahPergi = false;
-statusPosSudahDiterima = false;
 
 cobaSiapScanBerikutnyaSMART();
-if(
-  hasilBarcode.textContent.indexOf(
-    'MASUK KERANJANG'
-  ) === -1 &&
-  hasilBarcode.textContent.indexOf(
-    'STOK HABIS'
-  ) === -1 &&
-  hasilBarcode.textContent.indexOf(
-    'STOK TIDAK MENCUKUPI'
-  ) === -1 &&
-  hasilBarcode.textContent.indexOf(
-    'BARCODE TIDAK DITEMUKAN'
-  ) === -1
-){
-
-  hasilBarcode.textContent =
-    '✅ Siap scan berikutnya...';
-
-}
 
     }
 
@@ -496,6 +476,8 @@ if(
         // sampai barcode keluar dari frame.
 menungguBarcodePergi = true;
 waktuMulaiKosong = 0;
+barcodeSudahPergi = false;
+statusPosSudahDiterima = false;
 
       }
 
