@@ -40,6 +40,7 @@
 
   <script>
     const btnBukaKamera = document.getElementById('btnBukaKamera');
+    const btnSelesaiScan = document.getElementById('btnSelesaiScan');
     const previewKamera = document.getElementById('previewKamera');
     const statusKamera = document.getElementById('statusKamera');
     const hasilBarcode = document.getElementById('hasilBarcode');
@@ -80,7 +81,7 @@ const urlBackend =
         await previewKamera.play();
 
         statusKamera.textContent = '✅ Kamera berhasil dibuka.';
-
+btnSelesaiScan.style.display = 'inline-block';
         if (!('BarcodeDetector' in window)) {
           hasilBarcode.textContent =
             '❌ BarcodeDetector tidak didukung browser ini.';
