@@ -107,7 +107,38 @@ btnSelesaiScan.style.display = 'inline-block';
           '❌ Kamera gagal dibuka: ' + err.name + ' - ' + err.message;
       }
     });
+btnSelesaiScan.addEventListener('click', function () {
 
+  // Hentikan proses deteksi barcode
+  prosesScanAktif = false;
+
+  // Matikan kamera HP
+  if(previewKamera.srcObject){
+
+    previewKamera.srcObject
+      .getTracks()
+      .forEach(function(track){
+
+        track.stop();
+
+      });
+
+    previewKamera.srcObject = null;
+
+  }
+
+  statusKamera.textContent =
+    '✅ Scan selesai.';
+
+  hasilBarcode.textContent =
+    'Kembali ke POS...';
+
+
+  // Karena scanner dibuka dari POS dengan window.open(),
+  // browser seharusnya mengizinkan window ini ditutup.
+  window.close();
+
+});
 async function scanBarcode() {
 
   if(
