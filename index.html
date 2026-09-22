@@ -77,7 +77,69 @@ const channelScanner =
 
 const urlBackend =
   'https://script.google.com/macros/s/AKfycbw1xMC_sswRgcTvLdMzHL89TfJNjA0Z8oGQbIjiFyN5VUN72OP7M7KEyk9QQJfMgUWC/exec';
+// ======================================================
+// A13.7 - STATUS BALIK DARI POS KE CAMERA
+// ======================================================
 
+window.addEventListener(
+  'message',
+  function(event){
+
+    var data =
+      event.data || {};
+
+    if(
+      data.type !==
+      'SMART_POS_SCANNER_STATUS'
+    ){
+      return;
+    }
+
+    if(
+      String(data.channel || '') !==
+      channelScanner
+    ){
+      return;
+    }
+
+
+    if(data.status === 'SUKSES'){
+
+      hasilBarcode.style.background =
+        '#e8f5e9';
+
+      hasilBarcode.style.borderColor =
+        '#28a745';
+
+      hasilBarcode.textContent =
+        '✅ ' +
+        String(
+          data.pesan ||
+          'MASUK KERANJANG'
+        );
+
+    }
+
+
+    else if(data.status === 'GAGAL'){
+
+      hasilBarcode.style.background =
+        '#ffebee';
+
+      hasilBarcode.style.borderColor =
+        '#dc3545';
+
+      hasilBarcode.textContent =
+        '❌ ' +
+        String(
+          data.pesan ||
+          'GAGAL'
+        );
+
+    }
+
+  }
+);
 async function bukaKameraSMART(){
 
   // Kalau kamera sudah hidup, jangan buka lagi
