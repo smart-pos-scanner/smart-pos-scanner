@@ -37,6 +37,22 @@
     let barcodeDetector = null;
     let prosesScanAktif = false;
 
+    let menungguBarcodePergi = false;
+let frameKosong = 0;
+
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+const channelScanner =
+  String(
+    params.get('channel') || ''
+  ).trim();
+
+const urlBackend =
+  'https://script.google.com/macros/s/AKfycbw1xMC_sswRgcTvLdMzHL89TfJNjA0Z8oGQbIjiFyN5VUN72OP7M7KEyk9QQJfMgUWC/exec';
+
     btnBukaKamera.addEventListener('click', async function () {
       try {
         statusKamera.textContent = 'Membuka kamera...';
@@ -81,36 +97,172 @@
       }
     });
 
-    async function scanBarcode() {
-      if (!prosesScanAktif || !barcodeDetector) return;
+async function scanBarcode() {
 
-      try {
-        const barcodes = await barcodeDetector.detect(previewKamera);
+  if(
+    !prosesScanAktif ||
+    !barcodeDetector
+  ){
+    return;
+  }
 
-        if (barcodes.length > 0) {
-          const nilaiBarcode = String(barcodes[0].rawValue || '').trim();
+  try {
 
-if (nilaiBarcode) {
-  hasilBarcode.textContent = '✅ ' + nilaiBarcode;
-  prosesScanAktif = false;
+    const barcodes =
+      await barcodeDetector.detect(
+        previewKamera
+      );
 
-  console.log('SMART BARCODE SIAP DIKIRIM:', nilaiBarcode);
 
-const urlPOS =
-  'https://script.google.com/macros/s/AKfycbw1xMC_sswRgcTvLdMzHL89TfJNjA0Z8oGQbIjiFyN5VUN72OP7M7KEyk9QQJfMgUWC/exec';
+    // ======================================================
+    // BARCODE SUDAH DIKIRIM
+    // Tunggu barcode keluar dari kamera dulu
+    // ======================================================
 
-window.location.href =
-  urlPOS + '?barcode=' + encodeURIComponent(nilaiBarcode);
-  
-  return;
-}
+    if(menungguBarcodePergi){
+
+      if(barcodes.length === 0){
+
+        frameKosong++;
+
+        if(frameKosong >= 5){
+
+          menungguBarcodePergi = false;
+          frameKosong = 0;
+
+          hasilBarcode.textContent =
+            '✅ Siap scan berikutnya...';
+
         }
-      } catch (err) {
-        console.log('Scan barcode:', err);
+
+      }else{
+
+        frameKosong = 0;
+
       }
 
-      requestAnimationFrame(scanBarcode);
+
+      requestAnimationFrame(
+        scanBarcode
+      );
+
+      return;
+
     }
+
+
+    // ======================================================
+    // BARCODE BARU TERDETEKSI
+    // ======================================================
+
+    if(barcodes.length > 0){
+
+      const nilaiBarcode =
+        String(
+          barcodes[0].rawValue || ''
+        ).trim();
+
+
+      if(nilaiBarcode){
+
+        hasilBarcode.textContent =
+          '✅ ' + nilaiBarcode;
+
+
+        if(!channelScanner){
+
+          hasilBarcode.textContent =
+            '❌ Channel scanner tidak ditemukan.';
+
+          prosesScanAktif = false;
+
+          return;
+
+        }
+
+
+        // ==================================================
+        // KIRIM KE APPS SCRIPT TANPA PINDAH HALAMAN
+        // Hidden iframe menghindari masalah CORS
+        // ==================================================
+
+        const urlKirim =
+          urlBackend +
+          '?action=scannerPush' +
+          '&channel=' +
+          encodeURIComponent(
+            channelScanner
+          ) +
+          '&barcode=' +
+          encodeURIComponent(
+            nilaiBarcode
+          ) +
+          '&t=' +
+          Date.now();
+
+
+        let iframe =
+          document.getElementById(
+            'smartScannerKirimFrame'
+          );
+
+
+        if(!iframe){
+
+          iframe =
+            document.createElement(
+              'iframe'
+            );
+
+          iframe.id =
+            'smartScannerKirimFrame';
+
+          iframe.style.display =
+            'none';
+
+          document.body.appendChild(
+            iframe
+          );
+
+        }
+
+
+        iframe.src =
+          urlKirim;
+
+
+        console.log(
+          'SMART BARCODE DIKIRIM:',
+          nilaiBarcode,
+          channelScanner
+        );
+
+
+        // Kamera TETAP hidup.
+        // Barcode yang sama tidak dikirim berulang
+        // sampai barcode keluar dari frame.
+        menungguBarcodePergi = true;
+        frameKosong = 0;
+
+      }
+
+    }
+
+  } catch (err) {
+
+    console.log(
+      'Scan barcode:',
+      err
+    );
+
+  }
+
+
+  requestAnimationFrame(
+    scanBarcode
+  );
+
+}
   </script>
 
 </body>
