@@ -78,49 +78,104 @@ const channelScanner =
 const urlBackend =
   'https://script.google.com/macros/s/AKfycbw1xMC_sswRgcTvLdMzHL89TfJNjA0Z8oGQbIjiFyN5VUN72OP7M7KEyk9QQJfMgUWC/exec';
 
-    btnBukaKamera.addEventListener('click', async function () {
-      try {
-        statusKamera.textContent = 'Membuka kamera...';
+async function bukaKameraSMART(){
 
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: 'environment' }
-          },
-          audio: false
-        });
+  // Kalau kamera sudah hidup, jangan buka lagi
+  if(previewKamera.srcObject){
+    return;
+  }
 
-        previewKamera.srcObject = stream;
-        previewKamera.style.display = 'block';
+  try {
 
-        await previewKamera.play();
+    statusKamera.textContent =
+      'Membuka kamera...';
 
-        statusKamera.textContent = '✅ Kamera berhasil dibuka.';
-btnSelesaiScan.style.display = 'inline-block';
-        if (!('BarcodeDetector' in window)) {
-          hasilBarcode.textContent =
-            '❌ BarcodeDetector tidak didukung browser ini.';
-          return;
-        }
+    const stream =
+      await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: {
+            ideal: 'environment'
+          }
+        },
+        audio: false
+      });
 
-        barcodeDetector = new BarcodeDetector({
-          formats: [
-            'ean_13',
-            'ean_8',
-            'code_128',
-            'code_39',
-            'upc_a',
-            'upc_e'
-          ]
-        });
+    previewKamera.srcObject =
+      stream;
 
-        prosesScanAktif = true;
-        scanBarcode();
+    previewKamera.style.display =
+      'block';
 
-      } catch (err) {
-        statusKamera.textContent =
-          '❌ Kamera gagal dibuka: ' + err.name + ' - ' + err.message;
-      }
-    });
+    await previewKamera.play();
+
+    statusKamera.textContent =
+      '✅ Kamera berhasil dibuka.';
+
+    btnSelesaiScan.style.display =
+      'inline-block';
+
+
+    if(
+      !('BarcodeDetector' in window)
+    ){
+
+      hasilBarcode.textContent =
+        '❌ BarcodeDetector tidak didukung browser ini.';
+
+      return;
+    }
+
+
+    barcodeDetector =
+      new BarcodeDetector({
+        formats: [
+          'ean_13',
+          'ean_8',
+          'code_128',
+          'code_39',
+          'upc_a',
+          'upc_e'
+        ]
+      });
+
+
+    prosesScanAktif =
+      true;
+
+    scanBarcode();
+
+  } catch (err) {
+
+    statusKamera.textContent =
+      '❌ Kamera belum dapat dibuka otomatis. Tekan 📷 Buka Kamera.';
+
+    console.log(
+      'AUTO CAMERA:',
+      err
+    );
+
+  }
+
+}
+
+
+// Tombol tetap ada sebagai fallback
+btnBukaKamera.addEventListener(
+  'click',
+  bukaKameraSMART
+);
+
+
+// ======================================================
+// A13.7 - AUTO OPEN CAMERA
+// Begitu halaman scanner dibuka dari POS
+// ======================================================
+
+setTimeout(
+  bukaKameraSMART,
+  300
+);
+    
 btnSelesaiScan.addEventListener('click', function () {
 
   // Hentikan proses deteksi barcode
