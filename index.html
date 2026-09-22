@@ -38,7 +38,7 @@
     let prosesScanAktif = false;
 
     let menungguBarcodePergi = false;
-let frameKosong = 0;
+let waktuMulaiKosong = 0;
 
 const params =
   new URLSearchParams(
@@ -119,36 +119,53 @@ async function scanBarcode() {
     // Tunggu barcode keluar dari kamera dulu
     // ======================================================
 
-    if(menungguBarcodePergi){
+if(menungguBarcodePergi){
 
-      if(barcodes.length === 0){
+  if(barcodes.length > 0){
 
-        frameKosong++;
+    // Barcode masih terlihat.
+    // Reset waktu kosong.
+    waktuMulaiKosong = 0;
 
-        if(frameKosong >= 5){
+  }else{
 
-          menungguBarcodePergi = false;
-          frameKosong = 0;
+    // Kamera mulai tidak melihat barcode
+    if(!waktuMulaiKosong){
 
-          hasilBarcode.textContent =
-            '✅ Siap scan berikutnya...';
-
-        }
-
-      }else{
-
-        frameKosong = 0;
-
-      }
-
-
-      requestAnimationFrame(
-        scanBarcode
-      );
-
-      return;
+      waktuMulaiKosong =
+        Date.now();
 
     }
+
+
+    // Barcode harus hilang terus selama 1,2 detik
+    if(
+      Date.now() -
+      waktuMulaiKosong >=
+      1200
+    ){
+
+      menungguBarcodePergi =
+        false;
+
+      waktuMulaiKosong =
+        0;
+
+      hasilBarcode.textContent =
+        '✅ Siap scan berikutnya...';
+
+    }
+
+  }
+
+
+  requestAnimationFrame(
+    scanBarcode
+  );
+
+  return;
+
+}
 
 
     // ======================================================
@@ -241,8 +258,8 @@ async function scanBarcode() {
         // Kamera TETAP hidup.
         // Barcode yang sama tidak dikirim berulang
         // sampai barcode keluar dari frame.
-        menungguBarcodePergi = true;
-        frameKosong = 0;
+menungguBarcodePergi = true;
+waktuMulaiKosong = 0;
 
       }
 
