@@ -64,6 +64,8 @@
 
     let menungguBarcodePergi = false;
 let waktuMulaiKosong = 0;
+    let barcodeSudahPergi = false;
+let statusPosSudahDiterima = false;
 
 const params =
   new URLSearchParams(
@@ -81,6 +83,48 @@ const urlBackend =
 // A13.7 - STATUS BALIK DARI POS KE CAMERA
 // ======================================================
 
+    function cobaSiapScanBerikutnyaSMART(){
+
+  if(
+    !menungguBarcodePergi ||
+    !barcodeSudahPergi ||
+    !statusPosSudahDiterima
+  ){
+    return;
+  }
+
+  // Beri waktu kasir membaca hasil POS dulu
+  setTimeout(
+    function(){
+
+      if(
+        !menungguBarcodePergi ||
+        !barcodeSudahPergi ||
+        !statusPosSudahDiterima
+      ){
+        return;
+      }
+
+      menungguBarcodePergi = false;
+      waktuMulaiKosong = 0;
+      barcodeSudahPergi = false;
+      statusPosSudahDiterima = false;
+
+      hasilBarcode.style.background =
+        '#e8f5e9';
+
+      hasilBarcode.style.borderColor =
+        '#28a745';
+
+      hasilBarcode.textContent =
+        '✅ Siap scan berikutnya...';
+
+    },
+    1200
+  );
+
+}
+    
 window.addEventListener(
   'message',
   function(event){
@@ -137,7 +181,9 @@ window.addEventListener(
         );
 
     }
+statusPosSudahDiterima = true;
 
+cobaSiapScanBerikutnyaSMART();
   }
 );
 async function bukaKameraSMART(){
@@ -318,12 +364,12 @@ if(menungguBarcodePergi){
       1200
     ){
 
-      menungguBarcodePergi =
-        false;
+menungguBarcodePergi = true;
+waktuMulaiKosong = 0;
+barcodeSudahPergi = false;
+statusPosSudahDiterima = false;
 
-      waktuMulaiKosong =
-        0;
-
+cobaSiapScanBerikutnyaSMART();
 if(
   hasilBarcode.textContent.indexOf(
     'MASUK KERANJANG'
