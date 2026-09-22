@@ -24,19 +24,33 @@
   ">
   ✅ SELESAI SCAN
 </button>
-  <br><br>
+<br><br>
 
-  <video
-    id="previewKamera"
-    autoplay
-    playsinline
-    style="width:100%;max-width:500px;display:none;">
-  </video>
+<div
+  id="hasilBarcode"
+  style="
+    max-width:500px;
+    box-sizing:border-box;
+    padding:10px 12px;
+    margin-bottom:10px;
+    border-radius:8px;
+    background:#e8f5e9;
+    border:2px solid #28a745;
+    font-size:18px;
+    font-weight:bold;
+    text-align:center;
+  ">
+  ⏳ Siap membuka kamera...
+</div>
 
-  <p id="statusKamera"></p>
+<video
+  id="previewKamera"
+  autoplay
+  playsinline
+  style="width:100%;max-width:500px;display:none;">
+</video>
 
-  <h2>Hasil Barcode</h2>
-  <p id="hasilBarcode">Belum ada barcode terbaca.</p>
+<p id="statusKamera"></p>
 
   <script>
     const btnBukaKamera = document.getElementById('btnBukaKamera');
